@@ -190,13 +190,19 @@ namespace System.Drawing.Design
 				this.BorderStyle = BorderStyle.FixedSingle;
 			}
 
+			static readonly System.Text.RegularExpressions.Regex rex = new System.Text.RegularExpressions.Regex(@"(?<=(.))\p{Lu}");
+			public static string Depascal(string name)
+			{
+				return rex.Replace(name, " $0");
+			}
+
 			protected override void OnDrawItem(DrawItemEventArgs e) {
 				e.DrawBackground();
 				Color color = (Color)this.Items[e.Index];
 				using (System.Drawing.SolidBrush brush = new SolidBrush(color))
 					e.Graphics.FillRectangle(brush, 2,e.Bounds.Top+2,21,9);
 				e.Graphics.DrawRectangle(SystemPens.WindowText, 2,e.Bounds.Top+2,21,9);
-				e.Graphics.DrawString(color.Name, this.Font, SystemBrushes.WindowText, 26,e.Bounds.Top);
+				e.Graphics.DrawString(Depascal(color.Name), this.Font, SystemBrushes.WindowText, 26,e.Bounds.Top);
 				if ((e.State & DrawItemState.Selected) != 0)
 					e.DrawFocusRectangle();
 				base.OnDrawItem (e);
