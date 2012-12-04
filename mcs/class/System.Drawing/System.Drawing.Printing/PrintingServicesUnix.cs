@@ -597,7 +597,7 @@ namespace System.Drawing.Printing
 		/// </summary>
 		/// <param name="width"></param>
 		/// <param name="height"></param>
-		private PaperKind GetPaperKind (int width, int height)
+		private static PaperKind GetPaperKind (int width, int height)
 		{
 			if (width == 827 && height == 1169)
 				return PaperKind.A4;
@@ -693,15 +693,24 @@ namespace System.Drawing.Printing
 			int width = size.Width * 72 / 100;
 			int height = size.Height * 72 / 100;
 
+            PaperKind paper = GetPaperKind(page_settings.PaperSize.Width, page_settings.PaperSize.Height);
 			StringBuilder sb = new StringBuilder();
 			sb.Append(
 				"copies=" + printer_settings.Copies + " " + 
 				"Collate=" + printer_settings.Collate + " " +
 				"ColorModel=" + (page_settings.Color ? "Color" : "Black") + " " +
-				"PageSize=" + String.Format ("Custom.{0}x{1}", width, height) + " " +
+                (paper == PaperKind.A4? "Media=A4 "
+				 : "PageSize=" + String.Format ("Custom.{0}x{1}", width, height) + " ") +
 				"landscape=" + page_settings.Landscape
 			);
-			
+            {
+                sb.AppendFormat(
+                    " page-left={0} page-right={0} page-top={0} page-bottom={0}",
+                    page_settings.Margins.Left * 72 / 100,
+                    page_settings.Margins.Right * 72 / 100,
+                    page_settings.Margins.Top * 72 / 100,
+                    page_settings.Margins.Bottom * 72 / 100);
+			}
 			if (printer_settings.CanDuplex)
 			{
 				if (printer_settings.Duplex == Duplex.Simplex)
