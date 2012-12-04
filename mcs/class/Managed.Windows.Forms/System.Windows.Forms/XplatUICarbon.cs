@@ -1757,46 +1757,6 @@ namespace System.Windows.Forms {
 		}
 
 		internal override void SetIcon(IntPtr handle, Icon icon) {
-			Hwnd hwnd = Hwnd.ObjectFromHandle (handle);
-
-			// FIXME: we need to map the icon for active window switches
-			if (WindowMapping [hwnd.Handle] != null) {
-				if (icon == null) { 
-					RestoreApplicationDockTileImage ();
-				} else {
-					Bitmap		bitmap;
-					int		size;
-					IntPtr[]	data;
-					int		index;
-	
-					bitmap = new Bitmap (128, 128);
-					using (Graphics g = Graphics.FromImage (bitmap)) {
-						g.DrawImage (icon.ToBitmap (), 0, 0, 128, 128);
-					}
-					index = 0;
-					size = bitmap.Width * bitmap.Height;
-					data = new IntPtr[size];
-	
-					for (int y = 0; y < bitmap.Height; y++) {
-						for (int x = 0; x < bitmap.Width; x++) {
-							int pixel = bitmap.GetPixel (x, y).ToArgb ();
-							if (BitConverter.IsLittleEndian) {
-								byte a = (byte) ((pixel >> 24) & 0xFF);
-								byte r = (byte) ((pixel >> 16) & 0xFF);
-								byte g = (byte) ((pixel >> 8) & 0xFF);
-								byte b = (byte) (pixel & 0xFF);
-								data[index++] = (IntPtr)(a + (r << 8) + (g << 16) + (b << 24));
-							} else {
-								data[index++] = (IntPtr)pixel;
-							}
-						}
-					}
-
-					IntPtr provider = CGDataProviderCreateWithData (IntPtr.Zero, data, size*4, IntPtr.Zero);
-					IntPtr image = CGImageCreate (128, 128, 8, 32, 4*128, CGColorSpaceCreateDeviceRGB (), 4, provider, IntPtr.Zero, 0, 0);
-					SetApplicationDockTileImage (image);
-				}
-			}
 		}
 
 		
