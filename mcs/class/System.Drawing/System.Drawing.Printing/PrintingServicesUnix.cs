@@ -54,6 +54,7 @@ namespace System.Drawing.Printing
 		#region Constructor
 
 		internal PrintingServicesUnix () {
+			Console.WriteLine(GetType().FullName);
 		}
 		
 		static PrintingServicesUnix () {
@@ -115,6 +116,7 @@ namespace System.Drawing.Printing
 			try {
 				IntPtr ptr = cupsGetPPD (printer);
 				string ppd_filename = Marshal.PtrToStringAnsi (ptr);
+				Console.WriteLine ("Printer definition: "+ppd_filename);
 				IntPtr ppd_handle = ppdOpenFile (ppd_filename);
 				return ppd_handle;
 			}
@@ -694,6 +696,7 @@ namespace System.Drawing.Printing
 			int height = size.Height * 72 / 100;
 
             PaperKind paper = GetPaperKind(page_settings.PaperSize.Width, page_settings.PaperSize.Height);
+            System.Console.WriteLine("Paper: "+paper);
 			StringBuilder sb = new StringBuilder();
 			sb.Append(
 				"copies=" + printer_settings.Copies + " " + 
@@ -703,6 +706,9 @@ namespace System.Drawing.Printing
 				 : "PageSize=" + String.Format ("Custom.{0}x{1}", width, height) + " ") +
 				"landscape=" + page_settings.Landscape
 			);
+			System.Console.WriteLine("Defaults: "+printer_settings.DefaultPageSettings);
+			System.Console.WriteLine("This page: "+page_settings);
+            //if (page_settings.Margins != printer_settings.DefaultPageSettings.Margins)
             {
                 sb.AppendFormat(
                     " page-left={0} page-right={0} page-top={0} page-bottom={0}",
@@ -718,6 +724,8 @@ namespace System.Drawing.Printing
 				else
 					sb.Append(" Duplex=DuplexNoTumble");				
 			}
+
+			System.Console.WriteLine("Printer settings: "+sb.ToString());
 
 			return cupsParseOptions (sb.ToString(), 0, ref options);
 		}
